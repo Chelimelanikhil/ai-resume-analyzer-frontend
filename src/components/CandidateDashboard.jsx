@@ -71,7 +71,7 @@ export default function CandidateDashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const API_URL = "http://localhost:5000/api";
+      const API_URL = "https://ai-resume-analyzer-backend-1.onrender.com/api";
 
       const response = await fetch(`${API_URL}/jobs/match`, {
         method: "POST",
@@ -123,7 +123,7 @@ export default function CandidateDashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const API_URL = "http://localhost:5000/api";
+      const API_URL = "https://ai-resume-analyzer-backend-1.onrender.com/api";
 
       const queryParams = new URLSearchParams({
         query: searchQuery,
@@ -238,7 +238,7 @@ export default function CandidateDashboard() {
       // Optionally track application
       try {
         const token = localStorage.getItem("token");
-        const API_URL = "http://localhost:5000/api";
+        const API_URL = "https://ai-resume-analyzer-backend-1.onrender.com/api";
 
         await fetch(`${API_URL}/jobs/${job.id}/apply`, {
           method: "POST",
@@ -308,7 +308,7 @@ export default function CandidateDashboard() {
                 Naukri & LinkedIn
               </p>
 
-              <div
+             <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -320,6 +320,8 @@ export default function CandidateDashboard() {
                   onChange={handleFileSelect}
                   className="file-input"
                   disabled={loading}
+                  id="resume-upload-input"
+                  style={{ display: 'none' }}
                 />
                 <div className="upload-content">
                   <div className="upload-icon">
@@ -333,7 +335,11 @@ export default function CandidateDashboard() {
                   <p className="upload-info">
                     Supports PDF, DOC, DOCX (Max 5MB)
                   </p>
-                  <button className="select-file-btn" disabled={loading}>
+                  <button 
+                    className="select-file-btn" 
+                    disabled={loading}
+                    onClick={() => document.getElementById('resume-upload-input').click()}
+                  >
                     {loading ? "Uploading..." : "Select File"}
                   </button>
                 </div>

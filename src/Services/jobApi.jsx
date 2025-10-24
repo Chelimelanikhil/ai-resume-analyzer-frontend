@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = "https://ai-resume-analyzer-backend-1.onrender.com/api";
 
 /**
  * Fetch jobs based on user's resume data
