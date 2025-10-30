@@ -10,6 +10,7 @@ export default function AuthPages({ onLoginSuccess }) {
   const [selectedRole, setSelectedRole] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,46 +31,49 @@ export default function AuthPages({ onLoginSuccess }) {
       setAuthMode('signup');
     }, 300);
   };
-const handleSubmit = async () => {
-  setErrorMessage('');
-  try {
-    if (authMode === 'login') {
-      const data = await login(formData.email, formData.password);
 
-      console.log('Login data:', data);
+  const handleSubmit = async () => {
+    setErrorMessage('');
+    setIsLoading(true);
+    try {
+      if (authMode === 'login') {
+        const data = await login(formData.email, formData.password);
 
-      // if (!data || !data.success) {
-      //   setErrorMessage(data?.error || 'Login failed');
-      //   return;
-      // }
+        console.log('Login data:', data);
 
-      const user = data.user;
-      if (!user) {
-        setErrorMessage(data.error);
-        return;
+        // if (!data || !data.success) {
+        //   setErrorMessage(data?.error || 'Login failed');
+        //   setIsLoading(false);
+        //   return;
+        // }
+
+        const user = data.user;
+        if (!user) {
+          setErrorMessage(data.error);
+          setIsLoading(false);
+          return;
+        }
+
+        // Save token & user info
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', user.role);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        if (onLoginSuccess) onLoginSuccess(user.role);
+
+        if (user.role === 'candidate') navigate('/dashboard');
+        else navigate('/recruiter');
+      } else {
+        console.log('Signup data:', formData);
+        // Simulate signup delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setIsLoading(false);
       }
-
-      // Save token & user info
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userRole', user.role);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      if (onLoginSuccess) onLoginSuccess(user.role);
-
-      if (user.role === 'candidate') navigate('/dashboard');
-      else navigate('/recruiter');
-    } else {
-      console.log('Signup data:', formData);
+    } catch (err) {
+      setErrorMessage(err.message || 'Something went wrong. Please try again.');
+      setIsLoading(false);
     }
-  } catch (err) {
-    setErrorMessage(err.message || 'Something went wrong. Please try again.');
-  }
-};
-
-
-
-
-
+  };
 
   return (
     <div className="auth-page-container">
@@ -216,9 +220,19 @@ const handleSubmit = async () => {
               <button
                 onClick={handleSubmit}
                 className="submit-button primary"
+                disabled={isLoading}
               >
-                Sign In
-                <ArrowRight className="w-5 h-5" />
+                {isLoading ? (
+                  <>
+                    <div className="loader-spinner"></div>
+                    Signing In...
+                  </>
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </div>
 
@@ -357,9 +371,19 @@ const handleSubmit = async () => {
               <button
                 onClick={handleSubmit}
                 className={`submit-button ${selectedRole}`}
+                disabled={isLoading}
               >
-                Create Account
-                <ArrowRight className="w-5 h-5" />
+                {isLoading ? (
+                  <>
+                    <div className="loader-spinner"></div>
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </div>
 
