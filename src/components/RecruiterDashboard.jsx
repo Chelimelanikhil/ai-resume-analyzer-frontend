@@ -20,7 +20,7 @@ export default function RecruiterDashboard() {
   ];
 
     const handlelogout = () => {
-    navigate('/auth');
+    navigate('/');
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     window.location.reload();

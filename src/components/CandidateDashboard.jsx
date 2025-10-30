@@ -160,7 +160,7 @@ export default function CandidateDashboard() {
   };
 
   const handlelogout = () => {
-    navigate("/auth");
+    navigate("/");
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
     localStorage.removeItem("resumeData");
