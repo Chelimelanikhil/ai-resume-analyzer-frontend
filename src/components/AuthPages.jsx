@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, User, Briefcase, Users, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 import './AuthPages.css';
-import { login } from '../Services/api';
+import { login,register } from '../Services/api';
 
 export default function AuthPages({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -15,7 +15,8 @@ export default function AuthPages({ onLoginSuccess }) {
     name: '',
     email: '',
     password: '',
-    company: ''
+    company: '',
+    role: ''
   });
 
   const handleInputChange = (e) => {
@@ -33,48 +34,69 @@ export default function AuthPages({ onLoginSuccess }) {
   };
 
   const handleSubmit = async () => {
-    setErrorMessage('');
-    setIsLoading(true);
-    try {
-      if (authMode === 'login') {
-        const data = await login(formData.email, formData.password);
+  setErrorMessage('');
 
-        console.log('Login data:', data);
+  try {
+    if (authMode === 'login') {
+      // LOGIN FLOW
+      const data = await login(formData.email, formData.password);
 
-        // if (!data || !data.success) {
-        //   setErrorMessage(data?.error || 'Login failed');
-        //   setIsLoading(false);
-        //   return;
-        // }
+      console.log('Login data:', data);
 
-        const user = data.user;
-        if (!user) {
-          setErrorMessage(data.error);
-          setIsLoading(false);
-          return;
-        }
-
-        // Save token & user info
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userRole', user.role);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        if (onLoginSuccess) onLoginSuccess(user.role);
-
-        if (user.role === 'candidate') navigate('/dashboard');
-        else navigate('/recruiter');
-      } else {
-        console.log('Signup data:', formData);
-        // Simulate signup delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
+      const user = data.user;
+      if (!user) {
+        setErrorMessage(data.error || 'Login failed');
+        return;
       }
-    } catch (err) {
-      setErrorMessage(err.message || 'Something went wrong. Please try again.');
-      setIsLoading(false);
-    }
-  };
 
+      // Save token & user info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', user.role);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      if (onLoginSuccess) onLoginSuccess(user.role);
+
+      if (user.role === 'candidate') navigate('/dashboard');
+      else navigate('/recruiter');
+
+    } else {
+      // REGISTER FLOW ✅
+      console.log('Signup data:', formData);
+            console.log('selectedRole:', selectedRole);
+
+
+      const data = await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: selectedRole,
+        company: formData.role === 'recruiter' ? formData.company : undefined
+      });
+
+      console.log('Register data:', data);
+
+      const user = data.user;
+      if (!user) {
+        setErrorMessage(data.error || 'Registration failed');
+        return;
+      }
+
+      // Save token & user info (auto login after register)
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', user.role);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      if (onLoginSuccess) onLoginSuccess(user.role);
+
+      // Redirect same as login
+      if (user.role === 'candidate') navigate('/dashboard');
+      else navigate('/recruiter');
+    }
+
+  } catch (err) {
+    setErrorMessage(err.message || 'Something went wrong. Please try again.');
+  }
+};
   return (
     <div className="auth-page-container">
       <div className="auth-background">
@@ -290,6 +312,7 @@ export default function AuthPages({ onLoginSuccess }) {
 
             <div className="form-fields">
               <div className="form-field">
+                 {errorMessage && <p className="form-error">{errorMessage}</p>}
                 <label className="form-label">Full Name</label>
                 <div className="input-wrapper">
                   <User className="input-icon" />

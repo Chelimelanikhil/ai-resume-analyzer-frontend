@@ -13,6 +13,27 @@ export const login = async (email, password) => {
   }
 };
 
+export const register = async (userData) => {
+  console.log("Sending:", userData);
+
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/auth/register`,
+      userData
+    );
+
+    return response.data.data || response.data;
+
+  } catch (error) {
+    console.error('Register error:', error.response?.data || error.message);
+
+    return error.response?.data || {
+      success: false,
+      error: 'Registration failed'
+    };
+  }
+};
+
 
 
 export const uploadResume = async (file) => {
