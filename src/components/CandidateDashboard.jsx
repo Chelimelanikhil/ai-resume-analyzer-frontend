@@ -287,7 +287,7 @@ export default function CandidateDashboard() {
             <div className="user-info" onClick={handleProfileClick} style={{cursor:'pointer'}}>
               <User className="icon-user" />
               <span className="user-name">
-                {resumeData?.parsedData.name || "John Doe"}
+                {resumeData?.parsedData.name || JSON.parse(localStorage.getItem("user"))?.name}
               </span>
             </div>
             <button className="logout-btn" onClick={handlelogout}>

@@ -35,7 +35,7 @@ export default function AuthPages({ onLoginSuccess }) {
 
   const handleSubmit = async () => {
   setErrorMessage('');
-
+setIsLoading(true);
   try {
     if (authMode === 'login') {
       // LOGIN FLOW
@@ -46,6 +46,7 @@ export default function AuthPages({ onLoginSuccess }) {
       const user = data.user;
       if (!user) {
         setErrorMessage(data.error || 'Login failed');
+        setIsLoading(false);
         return;
       }
 
@@ -55,7 +56,7 @@ export default function AuthPages({ onLoginSuccess }) {
       localStorage.setItem('user', JSON.stringify(user));
 
       if (onLoginSuccess) onLoginSuccess(user.role);
-
+    setIsLoading(false);
       if (user.role === 'candidate') navigate('/dashboard');
       else navigate('/recruiter');
 
@@ -78,6 +79,7 @@ export default function AuthPages({ onLoginSuccess }) {
       const user = data.user;
       if (!user) {
         setErrorMessage(data.error || 'Registration failed');
+            setIsLoading(false);
         return;
       }
 
@@ -85,7 +87,7 @@ export default function AuthPages({ onLoginSuccess }) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('userRole', user.role);
       localStorage.setItem('user', JSON.stringify(user));
-
+    setIsLoading(false);
       if (onLoginSuccess) onLoginSuccess(user.role);
 
       // Redirect same as login
